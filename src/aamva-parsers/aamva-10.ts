@@ -67,35 +67,35 @@ export class AAMVA10Parser {
         }
 
         const license: DriversLicense = {
-            AddressCity: parsedFields.get(AAMVA10FieldMapping.DAI),
-            AddressCountry: parsedFields.get(AAMVA10FieldMapping.DCG),
-            AddressJurisdictionCode: parsedFields.get(AAMVA10FieldMapping.DAJ),
-            AddressPostalCode: parsedFields.get(AAMVA10FieldMapping.DAK),
-            AddressStreet: parsedFields.get(AAMVA10FieldMapping.DAG),
-            AliasFamilyName: parsedFields.get(AAMVA10FieldMapping.DBN),
-            AliasGivenName: parsedFields.get(AAMVA10FieldMapping.DBG),
-            AliasSuffixName: parsedFields.get(AAMVA10FieldMapping.DBS),
-            DateOfBirth: parsedFields.get(AAMVA10FieldMapping.DBB),
-            DocumentIssueDate: parsedFields.get(AAMVA10FieldMapping.DBD),
-            EyeColor: parsedFields.get(AAMVA10FieldMapping.DAY),
-            FirstName: parsedFields.get(AAMVA10FieldMapping.DAC),
-            HairColor: parsedFields.get(AAMVA10FieldMapping.DAZ),
-            Height: parsedFields.get(AAMVA10FieldMapping.DAU),
-            IsMale: parsedFields.get(AAMVA10FieldMapping.DBC) === "1",
-            LastName: parsedFields.get(AAMVA10FieldMapping.DCS),
-            LicenseId: parsedFields.get(AAMVA10FieldMapping.DAQ),
-            MiddleName: parsedFields.get(AAMVA10FieldMapping.DAD),
-            NameSuffix: parsedFields.get(AAMVA10FieldMapping.DCU),
-            OrganDonor: parsedFields.get(AAMVA10FieldMapping.DDK) === "1",
-            PlaceOfBirth: parsedFields.get(AAMVA10FieldMapping.DCI),
-            RaceEthnicity: parsedFields.get(AAMVA10FieldMapping.DCL),
-            Under18Until: parsedFields.get(AAMVA10FieldMapping.DDH),
-            Under19Until: parsedFields.get(AAMVA10FieldMapping.DDI),
-            Under21Until: parsedFields.get(AAMVA10FieldMapping.DDJ),
-            Veteran: parsedFields.get(AAMVA10FieldMapping.DDL) === "1",
-            WeightRange: parsedFields.get(AAMVA10FieldMapping.DCE)
+            AddressCity: parsedFields.get("DAI"),
+            AddressCountry: parsedFields.get("DCG"),
+            AddressJurisdictionCode: parsedFields.get("DAJ"),
+            AddressPostalCode: parsedFields.get("DAK"),
+            AddressStreet: parsedFields.get("DAG"),
+            AliasFamilyName: parsedFields.get("DBN"),
+            AliasGivenName: parsedFields.get("DBG"),
+            AliasSuffixName: parsedFields.get("DBS"),
+            DateOfBirth: parsedFields.get("DBB"),
+            DocumentIssueDate: parsedFields.get("DBD"),
+            EyeColor: parsedFields.get("DAY"),
+            FirstName: parsedFields.get("DAC"),
+            HairColor: parsedFields.get("DAZ"),
+            Height: parsedFields.get("DAU"),
+            IsMale: parsedFields.get("DBC") === "1",
+            LastName: parsedFields.get("DCS"),
+            LicenseId: parsedFields.get("DAQ"),
+            MiddleName: parsedFields.get("DAD"),
+            NameSuffix: parsedFields.get("DCU"),
+            OrganDonor: parsedFields.get("DDK") === "1",
+            PlaceOfBirth: parsedFields.get("DCI"),
+            RaceEthnicity: parsedFields.get("DCL"),
+            Under18Until: parsedFields.get("DDH"),
+            Under19Until: parsedFields.get("DDI"),
+            Under21Until: parsedFields.get("DDJ"),
+            Veteran: parsedFields.get("DDL") === "1",
+            WeightRange: parsedFields.get("DCE")
         };
-
+        
         return license;
     }
 }

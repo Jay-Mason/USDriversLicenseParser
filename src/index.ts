@@ -13,13 +13,12 @@ export function parseLicense(barcode: string): DriversLicense {
     const version = headerMatch[2];
 
     switch (version) {
-        case "08":
-            return new AAMVA08Parser().parse(barcode);
-        case "09":
-            return new AAMVA09Parser().parse(barcode);
         case "10":
             return new AAMVA10Parser().parse(barcode);
+        case "09":
+            return new AAMVA09Parser().parse(barcode);
+        case "08":
         default:
-            throw new Error("Unsupported AAMVA version");
+            return new AAMVA08Parser().parse(barcode);
     }
 }

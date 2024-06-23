@@ -44,9 +44,4 @@ describe('parseLicense', () => {
     const barcode = 'INVALID HEADER';
     expect(() => parseLicense(barcode)).toThrow('Header does not match AAMVA Standards');
   });
-
-  it('should throw an error for unsupported AAMVA version', () => {
-    const barcode = '@ANSI 12345699...';
-    expect(() => parseLicense(barcode)).toThrow('Unsupported AAMVA version');
-  });
 });
