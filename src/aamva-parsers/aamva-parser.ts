@@ -2,7 +2,8 @@ export class AAMVAParser {
     public parse(raw: string, fieldDefinitions: string[]): Map<string, string> {
         const result = new Map<string, string>();
 
-        const regex = new RegExp(`(${fieldDefinitions.join("|")})([^A-Z]{1,})`, "g");
+        const fieldsPattern = fieldDefinitions.join("|");
+        const regex = new RegExp(`(${fieldsPattern})(.*?)(?=${fieldsPattern}|$)`, "g");
 
         let match;
 
