@@ -1,0 +1,30 @@
+export interface DriversLicense {
+    AddressCity?: string;
+    AddressCountry?: string;
+    AddressJurisdictionCode?: string;
+    AddressPostalCode?: string;
+    AddressStreet?: string;
+    AddressStreet2?: string;
+    AliasFamilyName?: string;
+    AliasGivenName?: string;
+    AliasSuffixName?: string;
+    DateOfBirth?: string;
+    DocumentIssueDate?: string;
+    EyeColor?: string;
+    FirstName?: string;
+    HairColor?: string;
+    Height?: string;
+    IsMale?: boolean;
+    LastName?: string;
+    LicenseId?: string;
+    MiddleName?: string;
+    NameSuffix?: string;
+    OrganDonor?: boolean;
+    PlaceOfBirth?: string;
+    RaceEthnicity?: string;
+    Under18Until?: string;
+    Under19Until?: string;
+    Under21Until?: string;
+    Veteran?: boolean;
+    WeightRange?: string;
+}
