@@ -69,8 +69,8 @@ export class AAMVA08Parser {
         const license: DriversLicense = {
             AddressCity: parsedFields.get("DAI"),
             AddressCountry: parsedFields.get("DCG"),
-            AddressJurisdictionCode: parsedFields.get("DAJ"),
             AddressPostalCode: parsedFields.get("DAK"),
+            AddressState: parsedFields.get("DAJ"),
             AddressStreet: parsedFields.get("DAG"),
             AliasFamilyName: parsedFields.get("DBN"),
             AliasGivenName: parsedFields.get("DBG"),

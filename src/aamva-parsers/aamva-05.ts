@@ -1,7 +1,7 @@
 import { DriversLicense } from "../DriversLicense";
 import { AAMVAParser } from "./aamva-parser";
 
-enum AAMVA09FieldMapping {
+enum AAMVA05FieldMapping {
     //Mandatory Fields
     DCA = "Jurisdiction-specific vehicle class",
     DCB = "Jurisdiction-specific restriction codes",
@@ -56,10 +56,10 @@ enum AAMVA09FieldMapping {
     DDL = "Veteran"
 }
 
-export class AAMVA09Parser {
+export class AAMVA05Parser {
     public parse(raw: string): DriversLicense {
         const baseParser = new AAMVAParser();
-        const keys = Object.keys(AAMVA09FieldMapping);
+        const keys = Object.keys(AAMVA05FieldMapping);
         const parsedFields = baseParser.parse(raw, keys);
         
         if (parsedFields.size === 0) {

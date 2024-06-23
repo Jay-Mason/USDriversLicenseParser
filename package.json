@@ -1,7 +1,7 @@
 {
   "name": "usdriverslicenseparser",
-  "version": "1.0.2",
-  "description": "American Association of Motor Vehicle Administrators (AAMVA) Version '08', '09', and '10'.",
+  "version": "1.0.3",
+  "description": "American Association of Motor Vehicle Administrators (AAMVA) Versions '03' through '10'.",
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",

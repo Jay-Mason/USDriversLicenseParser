@@ -1,8 +1,8 @@
 export interface DriversLicense {
     AddressCity?: string;
     AddressCountry?: string;
-    AddressJurisdictionCode?: string;
     AddressPostalCode?: string;
+    AddressState?: string;
     AddressStreet?: string;
     AddressStreet2?: string;
     AliasFamilyName?: string;
