@@ -42,6 +42,6 @@ describe('parseLicense', () => {
 
   it('should throw an error for invalid header', () => {
     const barcode = 'INVALID HEADER';
-    expect(() => parseLicense(barcode)).toThrow('Header does not match AAMVA Standards');
+    expect(() => parseLicense(barcode)).toThrow('Missing ANSI Header, unable to determine version');
   });
 });
