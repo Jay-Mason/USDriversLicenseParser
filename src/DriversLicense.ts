@@ -1,4 +1,20 @@
+export type Gender = "Male" | "Female" | "NotSpecified";
+
+export function parseGender(dbc?: string): Gender | undefined {
+    switch (dbc) {
+        case "1":
+            return "Male";
+        case "2":
+            return "Female";
+        case "9":
+            return "NotSpecified";
+        default:
+            return undefined;
+    }
+}
+
 export interface DriversLicense {
+    AamvaVersion?: string;
     AddressCity?: string;
     AddressCountry?: string;
     AddressPostalCode?: string;
@@ -9,12 +25,16 @@ export interface DriversLicense {
     AliasGivenName?: string;
     AliasSuffixName?: string;
     DateOfBirth?: string;
+    DocumentExpirationDate?: string;
     DocumentIssueDate?: string;
     EyeColor?: string;
     FirstName?: string;
+    Gender?: Gender;
     HairColor?: string;
     Height?: string;
     IsMale?: boolean;
+    IssuerId?: string;
+    JurisdictionVersion?: string;
     LastName?: string;
     LicenseId?: string;
     MiddleName?: string;

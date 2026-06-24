@@ -1,23 +1,43 @@
 {
   "name": "usdriverslicenseparser",
-  "version": "1.0.11",
-  "description": "American Association of Motor Vehicle Administrators (AAMVA) Versions '03' through '10'.",
+  "version": "1.1.0",
+  "description": "Parse AAMVA PDF417 barcode data from U.S. driver's licenses and ID cards (versions 03–10). Zero dependencies.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "npx tsc",
-    "test": "jest"
+    "build": "tsc",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "aamva",
+    "drivers-license",
+    "drivers-license-parser",
+    "pdf417",
+    "barcode",
+    "barcode-parser",
+    "id-scanner",
+    "parser"
+  ],
+  "author": "Jay Mason",
   "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "jest": "^30.3.0",
-    "ts-jest": "^29.1.5",
-    "typescript": "^6.0.2"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Jay-Mason/USDriversLicenseParser.git"
+  },
+  "homepage": "https://github.com/Jay-Mason/USDriversLicenseParser#readme",
+  "bugs": {
+    "url": "https://github.com/Jay-Mason/USDriversLicenseParser/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.3"
   }
 }

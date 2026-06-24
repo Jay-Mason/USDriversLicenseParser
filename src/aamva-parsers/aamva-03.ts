@@ -1,8 +1,8 @@
-import { DriversLicense } from "../DriversLicense";
+import { DriversLicense, parseGender } from "../DriversLicense";
+import { MalformedBarcodeError } from "../errors";
 import { AAMVAParser } from "./aamva-parser";
 
 enum AAMVA03FieldMapping {
-    //Mandatory Fields
     DCA = "Jurisdiction-specific vehicle class",
     DCB = "Jurisdiction-specific restriction codes",
     DCD = "Jurisdiction-specific endorsement codes",
@@ -22,7 +22,6 @@ enum AAMVA03FieldMapping {
     DCF = "Document Discriminator",
     DCG = "Country Identification",
     DCH = "Federal Commercial Vehicle Codes",
-    //Optional Fields
     DAH = "Street Address 2",
     DAZ = "Hair Color",
     DCI = "Place of Birth",
@@ -47,20 +46,22 @@ export class AAMVA03Parser {
         const baseParser = new AAMVAParser();
         const keys = Object.keys(AAMVA03FieldMapping);
         const parsedFields = baseParser.parse(raw, keys);
-        
+
         if (parsedFields.size === 0) {
-            throw new Error("No fields found in barcode");
+            throw new MalformedBarcodeError("No fields found in barcode");
         }
 
         const givenNameSplit = parsedFields.get("DCT")?.split(" ") ?? undefined;
 
-        let firstName = undefined;
-        let middleName = undefined;
+        let firstName: string | undefined = undefined;
+        let middleName: string | undefined = undefined;
 
         if (givenNameSplit) {
             firstName = givenNameSplit.length > 0 ? givenNameSplit[0] : undefined;
             middleName = givenNameSplit.length > 1 ? givenNameSplit.slice(1).join(" ") : undefined;
         }
+
+        const gender = parseGender(parsedFields.get("DBC"));
 
         const license: DriversLicense = {
             AddressCity: parsedFields.get("DAI"),
@@ -68,16 +69,19 @@ export class AAMVA03Parser {
             AddressPostalCode: parsedFields.get("DAK"),
             AddressState: parsedFields.get("DAJ"),
             AddressStreet: parsedFields.get("DAG"),
+            AddressStreet2: parsedFields.get("DAH"),
             AliasFamilyName: parsedFields.get("DBN"),
             AliasGivenName: parsedFields.get("DBG"),
             AliasSuffixName: parsedFields.get("DBS"),
             DateOfBirth: parsedFields.get("DBB"),
+            DocumentExpirationDate: parsedFields.get("DBA"),
             DocumentIssueDate: parsedFields.get("DBD"),
             EyeColor: parsedFields.get("DAY"),
             FirstName: firstName,
+            Gender: gender,
             HairColor: parsedFields.get("DAZ"),
             Height: parsedFields.get("DAU"),
-            IsMale: parsedFields.get("DBC") === "1",
+            IsMale: gender === "Male",
             LastName: parsedFields.get("DCS"),
             LicenseId: parsedFields.get("DAQ"),
             MiddleName: middleName,

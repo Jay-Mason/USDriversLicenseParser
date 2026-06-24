@@ -1,8 +1,9 @@
 import { DriversLicense } from "../DriversLicense";
+import { MalformedBarcodeError } from "../errors";
 import { AAMVAParser } from "./aamva-parser";
+import { mapStandardLicense } from "./map-standard-license";
 
 enum AAMVA09FieldMapping {
-    //Mandatory Fields
     DCA = "Jurisdiction-specific vehicle class",
     DCB = "Jurisdiction-specific restriction codes",
     DCD = "Jurisdiction-specific endorsement codes",
@@ -25,7 +26,6 @@ enum AAMVA09FieldMapping {
     DDE = "Customer Family Name Truncation",
     DDF = "Customer First Name Truncation",
     DDG = "Customer Middle Name Truncation",
-    //Optional Fields
     DAH = "Street Address 2",
     DAZ = "Hair Color",
     DCI = "Place of Birth",
@@ -61,41 +61,11 @@ export class AAMVA09Parser {
         const baseParser = new AAMVAParser();
         const keys = Object.keys(AAMVA09FieldMapping);
         const parsedFields = baseParser.parse(raw, keys);
-        
+
         if (parsedFields.size === 0) {
-            throw new Error("No fields found in barcode");
+            throw new MalformedBarcodeError("No fields found in barcode");
         }
 
-        const license: DriversLicense = {
-            AddressCity: parsedFields.get("DAI"),
-            AddressCountry: parsedFields.get("DCG"),
-            AddressPostalCode: parsedFields.get("DAK"),
-            AddressState: parsedFields.get("DAJ"),
-            AddressStreet: parsedFields.get("DAG"),
-            AliasFamilyName: parsedFields.get("DBN"),
-            AliasGivenName: parsedFields.get("DBG"),
-            AliasSuffixName: parsedFields.get("DBS"),
-            DateOfBirth: parsedFields.get("DBB"),
-            DocumentIssueDate: parsedFields.get("DBD"),
-            EyeColor: parsedFields.get("DAY"),
-            FirstName: parsedFields.get("DAC"),
-            HairColor: parsedFields.get("DAZ"),
-            Height: parsedFields.get("DAU"),
-            IsMale: parsedFields.get("DBC") === "1",
-            LastName: parsedFields.get("DCS"),
-            LicenseId: parsedFields.get("DAQ"),
-            MiddleName: parsedFields.get("DAD"),
-            NameSuffix: parsedFields.get("DCU"),
-            OrganDonor: parsedFields.get("DDK") === "1",
-            PlaceOfBirth: parsedFields.get("DCI"),
-            RaceEthnicity: parsedFields.get("DCL"),
-            Under18Until: parsedFields.get("DDH"),
-            Under19Until: parsedFields.get("DDI"),
-            Under21Until: parsedFields.get("DDJ"),
-            Veteran: parsedFields.get("DDL") === "1",
-            WeightRange: parsedFields.get("DCE")
-        };
-
-        return license;
+        return mapStandardLicense(parsedFields);
     }
 }
