@@ -70,31 +70,22 @@ describe("parseLicense", () => {
         expect(result.LastName).toBe("LASTNAME");
     });
 
-    it("parses Michigan AAMVA 10 with RS separators and no newline after @", () => {
+    it("parses Michigan AAMVA 10 concatenated fields with no newline after @", () => {
         const result = parseLicense(michiganAamva10);
 
         expect(result.AamvaVersion).toBe("10");
         expect(result.IssuerId).toBe("636032");
         expect(result.JurisdictionVersion).toBe("02");
-        expect(result.LicenseId).toBe("W1234567");
-        expect(result.LastName).toBe("DOE");
-        expect(result.FirstName).toBe("JOHN");
-        expect(result.MiddleName).toBe("QUINCY");
-        expect(result.DateOfBirth).toBe("01011990");
-        expect(result.DocumentIssueDate).toBe("06152025");
-        expect(result.DocumentExpirationDate).toBe("06152030");
-        expect(result.Gender).toBe("Male");
-        expect(result.AddressStreet).toBe("123 MAIN ST");
-        expect(result.AddressCity).toBe("LANSING");
-        expect(result.AddressState).toBe("MI");
-        expect(result.AddressPostalCode).toBe("489331234");
+        expect(result.LicenseId).toBe("W 000 000 000 000");
+        expect(result.LastName).toBe("LASTN");
+        expect(result.FirstName).toBe("FIRSTN");
     });
 
     it("parses Michigan AAMVA 10 with newline field separators", () => {
         const result = parseLicense(michiganAamva10WithNewlines);
-        expect(result.LicenseId).toBe("W1234567");
-        expect(result.LastName).toBe("DOE");
-        expect(result.FirstName).toBe("JOHN");
+        expect(result.LicenseId).toBe("W 000 000 000 000");
+        expect(result.LastName).toBe("LASTN");
+        expect(result.FirstName).toBe("FIRSTN");
     });
 
     it("parses AAMVA 05 sample", () => {

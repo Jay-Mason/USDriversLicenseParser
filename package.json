@@ -1,7 +1,7 @@
 {
   "name": "usdriverslicenseparser",
-  "version": "1.1.1",
-  "description": "Parse AAMVA PDF417 barcode data from U.S. driver's licenses and ID cards (versions 03–10). Zero dependencies.",
+  "version": "1.1.2",
+  "description": "Parse AAMVA PDF417 barcode data from U.S. driver's licenses and ID cards (versions 03-10). Zero dependencies.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
