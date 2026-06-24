@@ -167,3 +167,9 @@ export const nebraskaAamva09Crlf = nebraskaAamva09.replace(/\n/g, "\r\n");
 export const nebraskaAamva09CrOnly = nebraskaAamva09.replace(/\n/g, "\r");
 
 export const notSpecifiedGenderAamva09 = nebraskaAamva09.replace("DBC1", "DBC9");
+
+const RS = "\x1e";
+
+export const michiganAamva10 = `@ANSI 636032100202DL00410235ZM02760008DL${RS}DAQW1234567${RS}DCSDOE${RS}DDEU${RS}DACJOHN${RS}DDFU${RS}DADQUINCY${RS}DDGU${RS}DCAO${RS}DCBNONE${RS}DCDNONE${RS}DBD06152025${RS}DBB01011990${RS}DBA06152030${RS}DBC1${RS}DAU070 IN${RS}DAYBRO${RS}DAG123 MAIN ST${RS}DAILANSING${RS}DAJMI${RS}DAK489331234${RS}DCGUSA`;
+
+export const michiganAamva10WithNewlines = michiganAamva10.replace(/\x1e/g, "\n");

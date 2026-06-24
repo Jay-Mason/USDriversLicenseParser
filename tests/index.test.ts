@@ -22,6 +22,8 @@ import {
     nebraskaAamva10,
     nebraskaWithAddressLine2,
     notSpecifiedGenderAamva09,
+    michiganAamva10,
+    michiganAamva10WithNewlines,
 } from "./fixtures";
 
 describe("parseLicense", () => {
@@ -66,6 +68,33 @@ describe("parseLicense", () => {
         const result = parseLicense(nebraskaAamva10);
         expect(result.AamvaVersion).toBe("10");
         expect(result.LastName).toBe("LASTNAME");
+    });
+
+    it("parses Michigan AAMVA 10 with RS separators and no newline after @", () => {
+        const result = parseLicense(michiganAamva10);
+
+        expect(result.AamvaVersion).toBe("10");
+        expect(result.IssuerId).toBe("636032");
+        expect(result.JurisdictionVersion).toBe("02");
+        expect(result.LicenseId).toBe("W1234567");
+        expect(result.LastName).toBe("DOE");
+        expect(result.FirstName).toBe("JOHN");
+        expect(result.MiddleName).toBe("QUINCY");
+        expect(result.DateOfBirth).toBe("01011990");
+        expect(result.DocumentIssueDate).toBe("06152025");
+        expect(result.DocumentExpirationDate).toBe("06152030");
+        expect(result.Gender).toBe("Male");
+        expect(result.AddressStreet).toBe("123 MAIN ST");
+        expect(result.AddressCity).toBe("LANSING");
+        expect(result.AddressState).toBe("MI");
+        expect(result.AddressPostalCode).toBe("489331234");
+    });
+
+    it("parses Michigan AAMVA 10 with newline field separators", () => {
+        const result = parseLicense(michiganAamva10WithNewlines);
+        expect(result.LicenseId).toBe("W1234567");
+        expect(result.LastName).toBe("DOE");
+        expect(result.FirstName).toBe("JOHN");
     });
 
     it("parses AAMVA 05 sample", () => {
@@ -172,6 +201,10 @@ describe("normalizeBarcode", () => {
 
     it("converts CR-only line endings to LF", () => {
         expect(normalizeBarcode("DAQN99999999\rDCSLASTNAME")).toBe("DAQN99999999\nDCSLASTNAME");
+    });
+
+    it("converts RS element separators to LF", () => {
+        expect(normalizeBarcode("DAQN99999999\x1eDCSLASTNAME")).toBe("DAQN99999999\nDCSLASTNAME");
     });
 });
 
