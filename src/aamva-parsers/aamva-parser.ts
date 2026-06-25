@@ -1,6 +1,33 @@
 import { MalformedBarcodeError } from "../errors";
 
 const FIELD_ID_PATTERN = /D[A-Z]{2}/;
+const JURISDICTION_SUBFILE_PATTERN = /Z[A-Z]{2}\d{8}/;
+const SINGLE_CHAR_FIELDS = new Set(["DDA", "DDE", "DDF", "DDG", "DDD"]);
+
+function stripJurisdictionSubfile(data: string): string {
+    const newlineIndex = data.search(/\nZ[A-Z]{2}/);
+    if (newlineIndex >= 0) {
+        return data.slice(0, newlineIndex);
+    }
+
+    const match = data.match(JURISDICTION_SUBFILE_PATTERN);
+    if (match && match.index !== undefined && match.index > 0) {
+        return data.slice(0, match.index);
+    }
+
+    return data;
+}
+
+function stripLeadingSubfileMarker(data: string, allowedFields: Set<string>): string {
+    if (data.startsWith("DL")) {
+        const afterType = data.slice(2);
+        if (allowedFields.has(afterType.substring(0, 3))) {
+            return afterType;
+        }
+    }
+
+    return data;
+}
 
 function alignSubfileSlice(raw: string, offset: number, length: number): string {
     let data = raw.slice(offset, offset + length);
@@ -18,16 +45,130 @@ function alignSubfileSlice(raw: string, offset: number, length: number): string 
         }
     }
 
-    const jurisdictionIndex = data.search(/\nZ[A-Z]{2}/);
-    if (jurisdictionIndex >= 0) {
-        data = data.slice(0, jurisdictionIndex);
+    return data;
+}
+
+const FIELD_ORDER = [
+    "DAQ",
+    "DCS",
+    "DDE",
+    "DAC",
+    "DDF",
+    "DAD",
+    "DDG",
+    "DCU",
+    "DBN",
+    "DBG",
+    "DBS",
+    "DCA",
+    "DCB",
+    "DCD",
+    "DBA",
+    "DBD",
+    "DBB",
+    "DBC",
+    "DAY",
+    "DAZ",
+    "DAU",
+    "DAW",
+    "DAX",
+    "DAG",
+    "DAH",
+    "DAI",
+    "DAJ",
+    "DAK",
+    "DCF",
+    "DCG",
+    "DCI",
+    "DCJ",
+    "DCK",
+    "DCL",
+    "DCE",
+    "DCM",
+    "DCN",
+    "DCO",
+    "DCP",
+    "DCQ",
+    "DCR",
+    "DDA",
+    "DDB",
+    "DDC",
+    "DDD",
+    "DDH",
+    "DDI",
+    "DDJ",
+    "DDK",
+    "DDL",
+    "DCT",
+];
+
+function getFieldOrder(code: string): number {
+    const index = FIELD_ORDER.indexOf(code);
+    return index >= 0 ? index : FIELD_ORDER.length;
+}
+
+function findNextFieldIndex(
+    compact: string,
+    from: number,
+    allowedFields: Set<string>,
+    currentCode?: string
+): number {
+    const currentOrder = currentCode ? getFieldOrder(currentCode) : -1;
+
+    let first = -1;
+    for (let i = from; i + 3 <= compact.length; i++) {
+        if (allowedFields.has(compact.substring(i, i + 3))) {
+            first = i;
+            break;
+        }
+    }
+    if (first < 0) {
+        return -1;
     }
 
-    if (data.startsWith("DL")) {
-        const afterType = data.slice(2);
-        if (FIELD_ID_PATTERN.test(afterType.substring(0, 3))) {
-            data = afterType;
+    let best = first;
+    let bestOrder = getFieldOrder(compact.substring(first, first + 3));
+    for (let i = first + 1; i <= first + 2 && i + 3 <= compact.length; i++) {
+        const code = compact.substring(i, i + 3);
+        if (!allowedFields.has(code)) {
+            continue;
         }
+
+        const order = getFieldOrder(code);
+        if (order > currentOrder && order < bestOrder) {
+            best = i;
+            bestOrder = order;
+        }
+    }
+
+    return best;
+}
+
+function resolveSubfileData(
+    raw: string,
+    designatorEnd: number,
+    offset: number,
+    length: number,
+    allowedFields: Set<string>
+): string {
+    let data = stripJurisdictionSubfile(alignSubfileSlice(raw, offset, length));
+    data = stripLeadingSubfileMarker(data, allowedFields);
+
+    if (allowedFields.has(data.substring(0, 3))) {
+        return data;
+    }
+
+    const searchEnd = Math.min(raw.length, Math.max(offset + length, designatorEnd + length));
+    for (let i = designatorEnd; i + 3 <= searchEnd; i++) {
+        const code = raw.substring(i, i + 3);
+        if (!allowedFields.has(code)) {
+            continue;
+        }
+
+        let end = Math.max(offset + length, i + length);
+        end = Math.min(end, raw.length);
+        data = stripJurisdictionSubfile(raw.slice(i, end));
+        return stripLeadingSubfileMarker(data, allowedFields);
     }
 
     return data;
@@ -50,93 +191,52 @@ function parseByLines(lines: string[], allowedFields: Set<string>): Map<string, 
     return result;
 }
 
-const SINGLE_CHAR_FIELDS = new Set(["DDA", "DDE", "DDF", "DDG", "DDD"]);
-
-function parseConcatenatedFrom(
-    compact: string,
-    allowedFields: Set<string>,
-    pos: number
-): Map<string, string> {
-    if (pos + 3 > compact.length) {
-        return new Map();
-    }
-
-    const code = compact.substring(pos, pos + 3);
-    if (!allowedFields.has(code)) {
-        return new Map();
-    }
-
-    if (SINGLE_CHAR_FIELDS.has(code)) {
-        if (pos + 4 > compact.length) {
-            return new Map();
-        }
-        const result = new Map<string, string>();
-        result.set(code, compact.substring(pos + 3, pos + 4));
-        const rest = parseConcatenatedFrom(compact, allowedFields, pos + 4);
-        rest.forEach((value, key) => result.set(key, value));
-        return result;
-    }
-
-    const candidates: number[] = [];
-    for (let i = pos + 3; i + 3 <= compact.length; i++) {
-        if (allowedFields.has(compact.substring(i, i + 3))) {
-            candidates.push(i);
-        }
-    }
-
-    if (candidates.length === 0) {
-        const result = new Map<string, string>();
-        result.set(code, compact.substring(pos + 3).trim());
-        return result;
-    }
-
-    let best: Map<string, string> | undefined;
-    for (const nextPos of candidates) {
-        const trial = new Map<string, string>();
-        trial.set(code, compact.substring(pos + 3, nextPos).trim());
-        const rest = parseConcatenatedFrom(compact, allowedFields, nextPos);
-        rest.forEach((value, key) => trial.set(key, value));
-
-        if (
-            !best ||
-            trial.size > best.size ||
-            (trial.size === best.size &&
-                (trial.get(code)?.length ?? 0) > (best.get(code)?.length ?? 0))
-        ) {
-            best = trial;
-        }
-    }
-
-    return best ?? new Map();
-}
-
 function parseConcatenated(data: string, allowedFields: Set<string>): Map<string, string> {
     const compact = data.replace(/\n/g, "");
+    const result = new Map<string, string>();
 
-    let pos = 0;
-    if (pos + 3 <= compact.length && !allowedFields.has(compact.substring(pos, pos + 3))) {
-        let found = -1;
-        for (let i = 0; i + 3 <= compact.length; i++) {
-            if (allowedFields.has(compact.substring(i, i + 3))) {
-                found = i;
-                break;
-            }
-        }
-        if (found < 0) {
-            return new Map();
-        }
-        pos = found;
+    let pos = allowedFields.has(compact.substring(0, 3))
+        ? 0
+        : findNextFieldIndex(compact, 0, allowedFields);
+    if (pos < 0) {
+        return result;
     }
 
-    return parseConcatenatedFrom(compact, allowedFields, pos);
+    while (pos + 3 <= compact.length) {
+        const code = compact.substring(pos, pos + 3);
+        if (!allowedFields.has(code)) {
+            break;
+        }
+
+        if (SINGLE_CHAR_FIELDS.has(code)) {
+            if (pos + 4 > compact.length) {
+                break;
+            }
+            result.set(code, compact.substring(pos + 3, pos + 4));
+            pos += 4;
+            continue;
+        }
+
+        const nextPos = findNextFieldIndex(compact, pos + 3, allowedFields, code);
+        if (nextPos < 0) {
+            result.set(code, compact.substring(pos + 3).trim());
+            break;
+        }
+
+        result.set(code, compact.substring(pos + 3, nextPos).trim());
+        pos = nextPos;
+    }
+
+    return result;
 }
 
-function extractDlSubfile(raw: string, fieldDefinitions: string[]): string {
+function extractDlSubfile(raw: string, fieldDefinitions: string[], allowedFields: Set<string>): string {
     const designatorMatch = raw.match(/DL(\d{4})(\d{4})/);
     if (designatorMatch) {
         const offset = parseInt(designatorMatch[1], 10);
         const length = parseInt(designatorMatch[2], 10);
-        return alignSubfileSlice(raw, offset, length);
+        const designatorEnd = designatorMatch.index! + designatorMatch[0].length;
+        return resolveSubfileData(raw, designatorEnd, offset, length, allowedFields);
     }
 
     const fieldPattern = new RegExp(fieldDefinitions.join("|"));
@@ -145,18 +245,13 @@ function extractDlSubfile(raw: string, fieldDefinitions: string[]): string {
         throw new MalformedBarcodeError("No DL subfile data found in barcode");
     }
 
-    let data = raw.slice(start);
-    const jurisdictionIndex = data.search(/\nZ[A-Z]{2}/);
-    if (jurisdictionIndex >= 0) {
-        data = data.slice(0, jurisdictionIndex);
-    }
-    return data;
+    return stripJurisdictionSubfile(raw.slice(start));
 }
 
 export class AAMVAParser {
     public parse(raw: string, fieldDefinitions: string[]): Map<string, string> {
         const allowedFields = new Set(fieldDefinitions);
-        const barcodeData = extractDlSubfile(raw, fieldDefinitions);
+        const barcodeData = extractDlSubfile(raw, fieldDefinitions, allowedFields);
         const lines = barcodeData.split("\n").filter((line) => line.length >= 3);
         const result =
             lines.length <= 1
